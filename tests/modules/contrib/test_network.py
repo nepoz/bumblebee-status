@@ -95,14 +95,17 @@ class TestNetworkUnit(TestCase):
 
         assert module.widgets()[0].full_text() == "Unknown ?%"
 
-    @mock.patch("builtins.open", **{"return_value.raiseError.side_effect": Exception()})
     @mock.patch("socket.create_connection")
     @mock.patch("netifaces.gateways")
     @mock.patch("netifaces.AF_INET", 18)
-    @mock.patch("builtins.open", mock.mock_open(read_data="wlan3"))
+    @mock.patch("builtins.open") 
     def test_no_wireless_file(self, gateways_mock, socket_mock, mock_open):
         gateways_mock.return_value = wired_default()
         socket_mock.return_value = mock.MagicMock()
+
+        mock_open = mock.mock_open()
+        mock_open.side_effect = Exception()
+
         module = build_module()
 
         assert module.widgets()[0].full_text() == "Ethernet"
